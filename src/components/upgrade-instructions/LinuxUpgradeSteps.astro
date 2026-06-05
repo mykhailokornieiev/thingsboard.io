@@ -1,4 +1,5 @@
 ---
+import { Code } from '@astrojs/starlight/components';
 import { UPGRADE_VERSIONS, getFamilySlug } from '~/models/upgrade-instructions';
 import type { Products } from '~/models/site.models';
 import PrepareSection from './PrepareSection.astro';
@@ -57,7 +58,7 @@ function needsCompatibilityCheck(version: string): boolean {
 {versions.map((v) => {
 	const newer = isNewerVersionScheme(v.version);
 	const needsCompat = needsCompatibilityCheck(v.version);
-	const heading = v.patch
+	const heading = v.patch && v.baseVersion !== v.displayVersion
 		? `Upgrading ThingsBoard${isPE ? ' PE' : ''} to latest ${v.baseVersion} (${v.displayVersion})`
 		: `Upgrading ThingsBoard${isPE ? ' PE' : ''} to ${v.displayVersion}`;
 	const prevLabel = v.x ? v.upgradableFrom : v.upgradableFrom;
@@ -81,6 +82,15 @@ function needsCompatibilityCheck(version: string): boolean {
 	return (
 		<section>
 			<h2 id={v.anchor}>{heading}</h2>
+
+			{(v.baseVersion === '4.3.1' || v.baseVersion === '4.2.2') && (
+				<aside class="starlight-aside starlight-aside--caution">
+					<p class="starlight-aside__title" aria-hidden="true">Important note before upgrading to ThingsBoard {v.baseVersion}</p>
+					<div class="starlight-aside__content">
+						<p>Starting with version {v.baseVersion}, the platform uses Angular 20 (upgraded from Angular 18). The core platform remains fully backward compatible and no upgrade scripts are required. However, custom UI code (widgets or custom CSS) that relies on internal component structure or CSS variable names may break. This can affect up to ~1% of users with heavy customizations. We recommend testing custom UI in a staging environment before upgrading.</p>
+					</div>
+				</aside>
+			)}
 
 			{needsCompat && (
 				<aside class="starlight-aside starlight-aside--caution">
@@ -153,19 +163,19 @@ function needsCompatibilityCheck(version: string): boolean {
 			{!isUbuntu && v.version === '3.8.0' && !isPE && (
 				<>
 					<h4>Install PostgreSQL contrib package (CentOS only)</h4>
-					<pre><code>sudo dnf install -y postgresql16-contrib</code></pre>
+					<Code code="sudo dnf install -y postgresql16-contrib" lang="bash" />
 				</>
 			)}
 
 			<h4>ThingsBoard{isPE ? ' PE' : ''} package download</h4>
-			<pre><code set:text={`wget ${dlUrl}`} /></pre>
+			<Code code={`wget ${dlUrl}`} lang="bash" />
 
 			<h4>ThingsBoard{isPE ? ' PE' : ''} service upgrade</h4>
 
 			<ul>
 				<li>Stop ThingsBoard service if it is running.</li>
 			</ul>
-			<pre><code>sudo service thingsboard stop</code></pre>
+			<Code code="sudo service thingsboard stop" lang="bash" />
 
 			{isPE && (
 				<ul>
@@ -173,7 +183,7 @@ function needsCompatibilityCheck(version: string): boolean {
 				</ul>
 			)}
 
-			<pre><code set:text={`sudo ${installCmd} ${pkg}`} /></pre>
+			<Code code={`sudo ${installCmd} ${pkg}`} lang="bash" />
 
 			<aside class="starlight-aside starlight-aside--note">
 				<p class="starlight-aside__title" aria-hidden="true">Note</p>
@@ -196,7 +206,7 @@ function needsCompatibilityCheck(version: string): boolean {
 							</div>
 						</aside>
 					)}
-					<pre><code set:text={`sudo /usr/share/thingsboard/bin/install/upgrade.sh${upgradeFlag}`} /></pre>
+					<Code code={`sudo /usr/share/thingsboard/bin/install/upgrade.sh${upgradeFlag}`} lang="bash" />
 				</>
 			)}
 
@@ -216,7 +226,7 @@ function needsCompatibilityCheck(version: string): boolean {
 				</aside>
 			)}
 
-			<pre><code>sudo service thingsboard start</code></pre>
+			<Code code="sudo service thingsboard start" lang="bash" />
 
 			{v.version === '3.4.2' && (
 				<aside class="starlight-aside starlight-aside--note">
@@ -231,21 +241,6 @@ function needsCompatibilityCheck(version: string): boolean {
 })}
 
 <style>
-	pre {
-		background: var(--sl-color-gray-6);
-		border: 1px solid var(--sl-color-gray-5);
-		border-radius: 4px;
-		padding: 0.75rem 1rem;
-		overflow-x: auto;
-		margin: 0.5rem 0 1rem;
-	}
-
-	pre code {
-		font-family: var(--sl-font-mono);
-		font-size: 0.85rem;
-		white-space: pre;
-	}
-
 	section {
 		margin-bottom: 3rem;
 	}

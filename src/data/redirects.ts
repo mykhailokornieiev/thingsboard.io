@@ -38,6 +38,13 @@ export interface CatchAllRedirect {
 	 * `src/content/docs/docs/{newPrefix}` to populate redirects.json.
 	 */
 	newPrefix?: string;
+	/**
+	 * Slugs (relative to newPrefix) to skip when scanning content for the JSON map.
+	 * Use for pages that never existed under {oldPrefix} (e.g. brand-new pages added
+	 * after the prefix split), so we don't emit redirects nobody needs. The splat
+	 * rule in _redirects still catches them at the edge if a request ever arrives.
+	 */
+	excludeSlugs?: string[];
 }
 
 export interface SingleRedirect {
@@ -163,7 +170,14 @@ export const CATCH_ALL_REDIRECTS: CatchAllRedirect[] = [
 		entries: [],
 	},
 	// Legacy product-tree splits: old /docs/pe/{product} prefixes → new /docs/{product}/pe
-	{ oldPrefix: 'pe/edge', newPrefix: 'edge/pe', entries: [] },
+	{
+		oldPrefix: 'pe/edge',
+		newPrefix: 'edge/pe',
+		entries: [],
+		// CLI and the new REST clients are post-prefix-split additions — no legacy
+		// /docs/pe/edge/{…} URL ever pointed at them.
+		excludeSlugs: ['user-guide/cli', 'reference/java-client', 'reference/python-client'],
+	},
 	{ oldPrefix: 'pe/mobile', newPrefix: 'mobile/pe', entries: [] },
 	// TBMQ PE Jekyll URLs — must come before `pe/mqtt-broker` so install/* maps directly
 	// to mqtt-broker/pe/installation/* (Cloudflare doesn't chain redirects)
@@ -1192,6 +1206,34 @@ export const SINGLE_REDIRECTS: SingleRedirect[] = [
 	{ oldPath: 'trendz/data-grouping-aggregation', target: '/docs/trendz/telemetry-aggregation/' },
 	{ oldPath: 'trendz/releases', target: '/docs/trendz/releases/releases-table/' },
 	{ oldPath: 'trendz/view-builder', target: '/docs/trendz/telemetry-aggregation/' },
+
+	{
+		oldPath: 'pe/solution-templates/fleet-tracking',
+		target: '/docs/pe/recipes/solution-templates/site-fleet-tracking/',
+	},
+	{
+		oldPath: 'paas/solution-templates/fleet-tracking',
+		target: '/docs/paas/recipes/solution-templates/site-fleet-tracking/',
+	},
+	{
+		oldPath: 'paas/eu/solution-templates/fleet-tracking',
+		target: '/docs/paas/eu/recipes/solution-templates/site-fleet-tracking/',
+	},
+	{ oldPath: 'user-guide/dashboard', target: '/docs/user-guide/dashboards/' },
+	{ oldPath: 'iot-gateway/modbus', target: '/docs/iot-gateway/config/modbus/' },
+	{ oldPath: 'getting-started-guide/hello-world', target: '/docs/getting-started/' },
+	{ oldPath: 'getting-started-guides/heloworld', target: '/docs/getting-started/' },
+	{ oldPath: 'getting-started-guides', target: '/docs/getting-started/' },
+	{ oldPath: 'user-guide/getting-started', target: '/docs/getting-started/' },
+	{ oldPath: 'user-guide/install', target: '/docs/installation/' },
+	{ oldPath: 'user-guide/install/openbsd', target: '/docs/installation/' },
+	{ oldPath: 'user-guide/install-and-use/install', target: '/docs/installation/' },
+	{ oldPath: 'mqtt-broker/security', target: '/docs/mqtt-broker/security/overview/' },
+	{ oldPath: 'reference/apis', target: '/docs/apis-and-sdks/' },
+	{ oldPath: 'reference/device-connectivity-api', target: '/docs/apis-and-sdks/' },
+	{ oldPath: 'reference/edge', target: '/docs/edge/' },
+	{ oldPath: 'user-guide/middleware', target: '/docs/user-guide/' },
+	{ oldPath: 'user-guide/ui', target: '/docs/user-guide/' },
 ];
 
 /**
