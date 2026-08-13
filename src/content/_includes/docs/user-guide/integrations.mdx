@@ -174,12 +174,12 @@ Each integration in the list shows a status badge:
 
 | Badge | Meaning |
 |-------|---------|
-| **Active** | The integration started (or was last updated) successfully. |
-| **Failed** | The last start or update attempt failed. Open the integration → **Events** tab → filter **Lifecycle event** to see the error. |
-| **Pending** | No successful start/update has been confirmed yet. This includes a freshly created integration that hasn't finished starting, and an integration that failed to start. |
+| **Active** | The integration started, or was updated, successfully. |
+| **Failed** | An update to a previously-running integration failed. Open the integration → **Events** tab → set **Event type** to **Lifecycle event** to see the error. |
+| **Pending** | The integration has not yet completed a successful start. This includes a freshly created integration still starting up, and one whose first start attempt failed — with or without a corresponding Lifecycle event. |
 
 <Aside type="tip">
-If an integration stays on **Pending** and never moves to **Active** or **Failed**, check the **Events** tab filtered to **Lifecycle event**: an entry there (even a failed one) confirms the integration attempted to start and tells you why. If there is no Lifecycle event at all, the failure happened earlier, before the integration reported anything — double-check the integration's configuration (connection details, converter assignment) and re-apply it.
+If an integration stays on **Pending**, check the **Events** tab with **Event type** set to **Lifecycle event**. An entry there — even a failed one — confirms the integration attempted to start and shows why. If there is no Lifecycle event at all, double-check the integration's configuration (connection details, assigned converters) and click **Apply changes** again; if the problem persists, contact support.
 </Aside>
 
 ## Integrations vs IoT Gateway
