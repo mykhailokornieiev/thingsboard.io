@@ -168,6 +168,20 @@ All integrations are listed in **Integration center &#8702; Integrations**. From
 - **Enable / Disable**: use the toggle on the integration row to pause message processing without deleting the integration. The configuration and assigned converters are preserved and take effect immediately when re-enabled.
 - **Delete**: click the delete icon on a row, or select multiple integrations and use bulk delete.
 
+### Integration Status
+
+Each integration in the list shows a status badge:
+
+| Badge | Meaning |
+|-------|---------|
+| **Active** | The integration started (or was last updated) successfully. |
+| **Failed** | The last start or update attempt failed. Open the integration → **Events** tab → filter **Lifecycle event** to see the error. |
+| **Pending** | No successful start/update has been confirmed yet. This includes a freshly created integration that hasn't finished starting, and an integration that failed to start. |
+
+<Aside type="tip">
+If an integration stays on **Pending** and never moves to **Active** or **Failed**, check the **Events** tab filtered to **Lifecycle event**: an entry there (even a failed one) confirms the integration attempted to start and tells you why. If there is no Lifecycle event at all, the failure happened earlier, before the integration reported anything — double-check the integration's configuration (connection details, converter assignment) and re-apply it.
+</Aside>
+
 ## Integrations vs IoT Gateway
 
 | | Platform Integrations | <DocLink product={Products.GW} path="">IoT Gateway</DocLink> |
