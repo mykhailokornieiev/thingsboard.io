@@ -7,6 +7,8 @@ import LinuxUpgradeSteps from '~/components/upgrade-instructions/LinuxUpgradeSte
 import WindowsUpgradeSteps from '~/components/upgrade-instructions/WindowsUpgradeSteps.astro';
 import DockerUpgradeSteps from '~/components/upgrade-instructions/DockerUpgradeSteps.astro';
 import DockerComposeUpgradeSteps from '~/components/upgrade-instructions/DockerComposeUpgradeSteps.astro';
+import { Aside } from '@astrojs/starlight/components';
+import DocLink from '@components/DocLink.astro';
 
 type Platform = 'ubuntu' | 'centos' | 'windows' | 'docker' | 'docker-compose';
 
@@ -17,6 +19,11 @@ const PLATFORM_LABELS: Record<Platform, string> = {
 	docker: 'Docker',
 	'docker-compose': 'Docker Compose',
 };
+
+function isLegacyImageEligible(family: string): boolean {
+	const [major, minor] = family.split('.').map(Number);
+	return major < 4 || (major === 4 && minor < 3);
+}
 
 export function getStaticPaths() {
 	const platforms: Platform[] = ['ubuntu', 'centos', 'windows', 'docker', 'docker-compose'];
@@ -52,6 +59,19 @@ const backUrl = '/docs/pe/installation/upgrade-instructions/';
 <StarlightPage frontmatter={{ title, description, tableOfContents: true }} headings={headings}>
 	<p><a href={backUrl}>&larr; Back to all versions</a></p>
 
+	{platform === 'docker' && isLegacyImageEligible(family) && (
+		<Aside type="caution" title="Still running the legacy all-in-one tb-pe image?">
+			<p>
+				If your compose file uses a single <code>thingsboard/tb-pe</code> service instead of
+				separate <code>thingsboard/tb-pe-node</code> and <code>thingsboard/tb-pe-web-report</code> services,
+				the steps below don't apply as-is. See{' '}
+				<DocLink product={product} path="installation/upgrade-instructions/docker-legacy-image-migration">
+					Migrating from the legacy all-in-one tb-pe image
+				</DocLink>{' '}
+				first.
+			</p>
+		</Aside>
+	)}
 	{platform === 'ubuntu' && (
 		<LinuxUpgradeSteps product={product} platform="ubuntu" filterFamily={family} />
 	)}
