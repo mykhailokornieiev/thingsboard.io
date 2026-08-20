@@ -73,6 +73,17 @@ export function assertNewestFirst(versions: readonly { version: string }[], list
 }
 
 /**
+ * True when `version` sorts at or after `threshold` in family/version order
+ * (e.g. familyAtLeast('4.2.1.2', '4.2') / familyAtLeast('4.3', '4.3')).
+ * Backs every "is this at least version X" gate in the upgrade-instructions
+ * components so they share one comparator instead of each re-parsing
+ * `major.minor` by hand.
+ */
+export function familyAtLeast(version: string, threshold: string): boolean {
+	return compareVersions(version, threshold) >= 0;
+}
+
+/**
  * Segment-wise numeric version compare; missing segments count as 0, so
  * "4.3.1.1" > "4.3.1". Hotfix suffixes sort as an extra segment, so
  * "1.10.3-HF7" > "1.10.3" (Trendz).

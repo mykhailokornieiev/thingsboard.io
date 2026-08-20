@@ -1,8 +1,9 @@
 ---
 import { Code } from '@astrojs/starlight/components';
 import { UPGRADE_VERSIONS, getFamilySlug, getUpgradeStepVersions } from '~/models/upgrade-instructions';
-import { getUpgradeHeading, patchFamilyLabel, patchScriptLabel } from '~/models/upgrade-shared';
+import { getUpgradeHeading, patchFamilyLabel, patchScriptLabel, familyAtLeast } from '~/models/upgrade-shared';
 import type { Products } from '~/models/site.models';
+import DocLink from '@components/DocLink.astro';
 
 interface Props {
 	product: Products;
@@ -14,17 +15,32 @@ const versions = getUpgradeStepVersions(filterFamily);
 const isPE = product === 'PE';
 
 function isNewerVersionScheme(version: string): boolean {
-	const parts = version.split('.');
-	const major = parseInt(parts[0], 10);
-	const minor = parseInt(parts[1], 10);
-	return major > 4 || (major === 4 && minor >= 2);
+	return familyAtLeast(version, '4.2');
 }
 
 function needsCompatibilityCheck(version: string): boolean {
-	const parts = version.split('.');
-	const major = parseInt(parts[0], 10);
-	const minor = parseInt(parts[1], 10);
-	return major > 4 || (major === 4 && minor >= 3);
+	return familyAtLeast(version, '4.3');
+}
+
+/**
+ * Last tag `thingsboard/tb-pe` (the all-in-one image) was published as —
+ * both it and `thingsboard/tb-pe-node` got this tag on 2025-10-14, then the
+ * all-in-one image stopped while tb-pe-node continued through 4.2.1.1PE,
+ * 4.2.2.x, and all of 4.3.x.
+ */
+const LAST_ALL_IN_ONE_TAG = '4.2.1';
+
+/**
+ * The legacy-image notice gates at family granularity, rounding
+ * LAST_ALL_IN_ONE_TAG up to the next family boundary — simpler than an exact
+ * patch-level check, and harmless: it just means 4.2.2.x readers (who could
+ * never have run the all-in-one image) also see the notice.
+ */
+const [legacyMajor, legacyMinor] = LAST_ALL_IN_ONE_TAG.split('.').map(Number);
+const FIRST_SPLIT_ONLY_FAMILY = `${legacyMajor}.${legacyMinor + 1}`;
+
+function showsLegacyImageNotice(family: string): boolean {
+	return !familyAtLeast(family, FIRST_SPLIT_ONLY_FAMILY);
 }
 
 function versionTag(ver: string): string {
@@ -50,6 +66,23 @@ function versionTag(ver: string): string {
 	return (
 		<section>
 			<h2 id={v.anchor}>{heading}</h2>
+
+			{isPE && showsLegacyImageNotice(v.family) && (
+				<aside class="starlight-aside starlight-aside--caution">
+					<p class="starlight-aside__title" aria-hidden="true">Still running the legacy all-in-one tb-pe image?</p>
+					<div class="starlight-aside__content">
+						<p>
+							If your compose file uses a single <code>thingsboard/tb-pe</code> service instead of
+							separate <code>thingsboard/tb-pe-node</code> and <code>thingsboard/tb-pe-web-report</code> services,
+							the steps below don't apply as-is. See{' '}
+							<DocLink product={product} path="installation/upgrade-instructions/docker-legacy-image-migration">
+								Migrating from the legacy all-in-one tb-pe image
+							</DocLink>{' '}
+							first.
+						</p>
+					</div>
+				</aside>
+			)}
 
 			{(v.baseVersion === '4.3.1' || v.baseVersion === '4.2.2') && (
 				<aside class="starlight-aside starlight-aside--caution">
