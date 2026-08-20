@@ -26,15 +26,15 @@ function needsCompatibilityCheck(version: string): boolean {
  * `thingsboard/tb-pe` (the all-in-one image) and `thingsboard/tb-pe-node`
  * both got tagged 4.2.1PE on 2025-10-14, then the all-in-one image stopped
  * while tb-pe-node continued through 4.2.1.1PE, 4.2.2.x, and all of 4.3.x.
- * The legacy-image notice below gates at family granularity (this constant)
- * rather than that exact patch — simpler, and harmless: it just means
- * 4.2.2.x readers (who could never have run the all-in-one image) also see
- * the notice.
+ * A reader stuck on that final 4.2.1PE all-in-one tag upgrades next to 4.3
+ * (4.3.x is upgradableFrom 4.2.1.x), so the notice has to reach the 4.3
+ * pages too. Upgrades are stepwise, so 4.4 onward can't be reached without
+ * passing through 4.3 first — the notice retires itself from there.
  */
-const FIRST_SPLIT_ONLY_FAMILY = '4.3';
+const FIRST_FAMILY_BEYOND_LEGACY_REACH = '4.4';
 
 function shouldShowLegacyImageNotice(family: string): boolean {
-	return !versionAtLeast(family, FIRST_SPLIT_ONLY_FAMILY);
+	return !versionAtLeast(family, FIRST_FAMILY_BEYOND_LEGACY_REACH);
 }
 
 function versionTag(ver: string): string {

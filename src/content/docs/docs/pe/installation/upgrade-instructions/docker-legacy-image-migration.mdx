@@ -65,7 +65,7 @@ This is a production system change. If possible, test the container-layout switc
 
 3. Add `REPORTS_SERVER_ENDPOINT_URL: http://tb-web-report:8383` to that service's `environment:` block. Keep all your other existing environment variables (license, MQTT/CoAP/LWM2M settings, etc.) unchanged.
 
-4. Add a new `tb-web-report` service:
+4. Add a new `tb-web-report` service under `services:`. This is the minimum working definition — the reference compose file in the Docker installation guide additionally sets logging and report timeout options you can copy across if you want to match it exactly:
 
    ```yaml
    tb-web-report:
@@ -94,7 +94,7 @@ This is a production system change. If possible, test the container-layout switc
 6. Confirm the platform comes up cleanly on your current version with the new two-container layout — same data, same license, same dashboards and devices — before proceeding to the version upgrade steps.
 
    <Aside type="note">
-   The version-upgrade commands on the next page (`docker compose stop thingsboard-pe`, `docker compose run --rm -e UPGRADE_TB=true thingsboard-pe`) assume a service named `thingsboard-pe`. Substitute your own service name (`<your-thingsboard-service-name>` above) when you run them.
+   The version-upgrade commands on the Docker upgrade instructions page (`docker compose stop thingsboard-pe`, `docker compose run --rm -e UPGRADE_TB=true thingsboard-pe`) assume a service named `thingsboard-pe`. Substitute your own service name (`<your-thingsboard-service-name>` above) when you run them.
    </Aside>
 
 </Steps>
@@ -122,7 +122,7 @@ If you're also changing the PostgreSQL image's major version as part of adopting
    docker volume create --name tb-pe-license-data
    ```
 
-3. Copy your existing bind-mounted data into the new volumes (adjust the source paths to match your current `docker-compose.yml`):
+3. Copy your existing bind-mounted data into the new volumes (adjust the source paths to match your current `docker-compose.yml`; `799` is the user ID of the ThingsBoard non-root Docker user):
 
    ```bash
    docker run --rm -v /path/to/thingsboard/.mytbpe-data/db:/source -v tb-postgres-data:/destination alpine sh -c "cp -a /source/. /destination/"
