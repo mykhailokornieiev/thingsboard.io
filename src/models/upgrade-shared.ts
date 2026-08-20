@@ -73,14 +73,14 @@ export function assertNewestFirst(versions: readonly { version: string }[], list
 }
 
 /**
- * True when `version` sorts at or after `threshold` in family/version order
- * (e.g. familyAtLeast('4.2.1.2', '4.2') / familyAtLeast('4.3', '4.3')).
+ * True when `version` sorts at or after `minVersion`
+ * (e.g. versionAtLeast('4.2.1.2', '4.2') / versionAtLeast('4.3', '4.3')).
  * Backs every "is this at least version X" gate in the upgrade-instructions
  * components so they share one comparator instead of each re-parsing
  * `major.minor` by hand.
  */
-export function familyAtLeast(version: string, threshold: string): boolean {
-	return compareVersions(version, threshold) >= 0;
+export function versionAtLeast(version: string, minVersion: string): boolean {
+	return compareVersions(version, minVersion) >= 0;
 }
 
 /**
