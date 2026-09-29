@@ -144,3 +144,9 @@ An <DocLink product={props.product} path="user-guide/device-profiles/#alarm-rule
 | Datasource alias resolves to no entities | Open **Entity aliases** in the dashboard and verify the alias returns results. |
 | No alarm rules defined | Verify the device profile has <DocLink product={props.product} path="user-guide/device-profiles/#alarm-rules" bold={false} target="_blank">alarm rules</DocLink> configured and that alarms have been triggered. |
 | Propagated alarms not counted | Enable **Search propagated alarms** to include alarms from child entities. |
+
+<p style="font-size: 1.5em; font-weight: bold;">Widget fails to load or shows an error</p>
+
+| Cause | Solution |
+|-------|----------|
+| Alarm history has grown large | Counting alarms across many entities or a wide time window can time out against a large alarm table. Narrow the datasource, severity, or type filters, or set **Alarms TTL days** in the <DocLink product={props.product} path='user-guide/tenant-profiles' bold={false} target='_blank'>Tenant profile</DocLink> Data Retention settings to bound alarm history growth. |
